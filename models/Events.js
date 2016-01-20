@@ -44,7 +44,11 @@ module.exports = function(io) {
          */
         sub.on('message', function(channel, message) {
             console.log("====> ", channel, message);
-            socket.emit(channel, message);
+            if('notification_test' == 'channel'){
+                socket.emit(message.channel, message);
+            }else{
+                socket.emit(channel, message);
+            }
         });
     })
 }

@@ -11,15 +11,14 @@ var sub = redis.createClient();
 router.get('/notify', function(req, res, next) {
     var channel = 'notification_test';
     var msg = {
+        channel: channel,
         status: 'success',
         message: 'Default message'
     }
 
-    /*if(req.query.channel){
-        channel = req.query.channel;
-        console.log(channel)
-        sub.subscribe(channel);
-    }*/
+    if(req.query.channel){
+        msg.channel = req.query.channel;
+    }
 
     if(req.query.message){
         msg.message = req.query.message;
