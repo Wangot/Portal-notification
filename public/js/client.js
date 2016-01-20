@@ -63,5 +63,10 @@ $(document).ready(function() {
                     console.log("http request failed (probably server not up yet)");
                 });
         };
+
+        // Test for sending notification
+        socket.on('notification_test', function(msg) {
+            console.log("notification_test ==> ", msg)
+        });
     }
 });

@@ -1,9 +1,21 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+var express = require('express');
+var router = express.Router();
 
-module.exports = router;
+module.exports = function(app){
+    // app.use('/api', require('./api'));
+
+    // PUBLIC PAGES
+    app.use('/', require('./public'));
+
+    // PROTOTYPE
+    app.use('/test', require('./test'));
+
+    // NOTE: Always put this at the end of the router instance
+    /*router.get('/:subdomain', function(req, res) {
+        res.redirect('http://www.ubook.no/');
+    });*/
+    app.use('/', router);
+};

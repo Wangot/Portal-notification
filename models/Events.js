@@ -3,6 +3,7 @@ var redis = require('redis');
 var sub = redis.createClient();
 var pub = redis.createClient();
 sub.subscribe('notification');
+sub.subscribe('notification_test');
 
 module.exports = function(io) {
     io.use(function(socket, callback){
@@ -42,6 +43,7 @@ module.exports = function(io) {
          When a message arrives, send it back to browser using socket.io
          */
         sub.on('message', function(channel, message) {
+            console.log("====> ", channel, message);
             socket.emit(channel, message);
         });
     })
