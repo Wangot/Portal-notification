@@ -43,9 +43,11 @@ module.exports = function(io) {
          When a message arrives, send it back to browser using socket.io
          */
         sub.on('message', function(channel, message) {
-            console.log("====> ", channel, message);
-            if('notification_test' == 'channel'){
-                socket.emit(message.channel, message);
+            // console.log("====> ", channel, message);
+            if('notification_test' == channel){
+                var msg = JSON.parse(message);
+                console.log("====> ", msg.channel, message);
+                socket.emit(msg.channel, message);
             }else{
                 socket.emit(channel, message);
             }
