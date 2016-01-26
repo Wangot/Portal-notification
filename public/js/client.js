@@ -1,72 +1,106 @@
-$(document).ready(function() {
-    initSocketIO();
 
+function SocketServer(host) {
 
-    function initSocketIO() {
+    host || (host = window.location.host);
 
-        /*
-         Connect to socket.io on the server.
-         */
-        var host = window.location.host //.split(':')[0];
-        var socket = io.connect('http://' + host, {
+    this.socket = null;
+
+    this.host = host;
+
+    /*
+     Connect to socket.io on the server.
+     */
+    var socket = this.connectToHost(host);
+    this.createEvents(socket);
+}
+
+_.extend(SocketServer.prototype, {
+    connectToHost: function(host) {
+
+        this.socket = io.connect('http://' + host, {
             'query': "token=" + "token_test",
-            reconnect: false,
-            'try multiple transports': false
-        });
-        var intervalID;
-        var reconnectCount = 0;
+            'try multiple transports': false,
 
-        socket.on('connect', function() {
+            'reconnection': true,
+            'reconnectionDelay': 1000,
+            'reconnectionDelayMax': 10000,
+        });
+
+        return this.socket;
+
+    },
+
+    createEvents: function(socket) {
+
+        socket.on('connect', _.bind(function() {
             console.log('connected');
             // send join message
+
             socket.emit('join', JSON.stringify({}));
-        });
+        }, this));
+
         socket.on('connecting', function() {
-            console.log('connecting');
+            //console.log('connecting');
         });
-        socket.on('disconnect', function() {
+
+        socket.on('disconnect', _.bind(function() {
             console.log('disconnect');
-            intervalID = setInterval(tryReconnect, 4000);
-        });
+        }, this));
+
         socket.on('connect_failed', function() {
-            console.log('connect_failed');
+            //console.log('connect_failed');
         });
+
         socket.on('error', function(err) {
             console.log('error: ' + err);
         });
+
         socket.on('reconnect_failed', function() {
-            console.log('reconnect_failed');
+            //console.log('reconnect_failed');
         });
+
         socket.on('reconnect', function() {
-            console.log('reconnected ');
+            //console.log('reconnected ');
         });
+
         socket.on('reconnecting', function() {
-            console.log('reconnecting');
+            //console.log('reconnecting');
         });
+    },
 
-        var tryReconnect = function() {
-            ++reconnectCount;
-            if (reconnectCount == 5) {
-                clearInterval(intervalID);
-            }
-            console.log('Making a dummy http call to set jsessionid (before we do socket.io reconnect)');
-            $.ajax('/')
-                .success(function() {
-                    console.log("http request succeeded");
-                    //reconnect the socket AFTER we got jsessionid set
-                    io.connect('http://' + host, {
-                        reconnect: false,
-                        'try multiple transports': false
-                    });
-                    clearInterval(intervalID);
-                }).error(function(err) {
-                    console.log("http request failed (probably server not up yet)");
+    registerAsAdmin: function() {
+
+        if(this.socket)
+        {
+            this.socket.on('COMPANY_ADMIN', function(msg) {
+                console.log("COMPANY_ADMIN ==> ", msg)
+            });
+        }
+
+    },
+
+    registerToCompanyNotifications: function(companies) {
+
+        companies || (companies = []);
+
+        if( (this.socket) && (companies.length > 0) )
+        {
+            for(var x=0; x<companies.length; x++)
+            {
+                console.log('SUBSCRIBING TO CHANNEL;', 'COMPANY_' + companies[x]);
+                this.socket.on('COMPANY_' + companies[x], function(msg) {
+                    console.log("COMPANY_NOTIFICATION ==> ", msg)
                 });
-        };
+            }
+        }
 
-        // Test for sending notification
-        socket.on('notification_test', function(msg) {
-            console.log("notification_test ==> ", msg)
-        });
     }
+});
+
+$(document).ready(function() {
+    window.socketServer = new SocketServer();
+
+    window.socketServer.registerAsAdmin();
+
+    window.socketServer.registerToCompanyNotifications([23,5]);
 });

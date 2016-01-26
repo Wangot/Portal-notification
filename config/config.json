@@ -1,0 +1,32 @@
+{
+  "development": {
+    "redis": {
+      "host": "localhost",
+      "port": 6379,
+      "secretKey": "secretKey",
+      "channels": {
+        "notification": "main-notification-channel"
+      }
+    }
+  },
+  "staging": {
+    "redis": {
+      "host": "localhost",
+      "port": 6379,
+      "secretKey": "secretKey",
+      "channels": {
+        "notification": "main-notification-channel"
+      }
+    }
+  },
+  "production": {
+    "redis": {
+      "host": "localhost",
+      "port": 6379,
+      "secretKey": "secretKey",
+      "channels": {
+        "notification": "main-notification-channel"
+      }
+    }
+  }
+}
